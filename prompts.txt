@@ -1,0 +1,22 @@
+Prompts:
+========
+** Hands-On: Building the EShop Product Business Logic (Services & DI) **
+
+1.
+
+The Target Entity: Generating the Product domain class
+prompt:
+Create Product domain class with Id, Name, Description, Price and ImageUrl properties.
+
+2.
+
+I need to implement the business logic and Minimal APIs for the `Product` domain model in the `ApiService` project. Please plan and execute the following steps:
+
+1. **ProductService.cs**: Create a new class that manages an in-memory `List<Product>`. Seed this list in the constructor with 5 realistic e-commerce products. Implement standard CRUD methods: GetAll, GetById, Create, Update, and Delete.
+2. **ProductEndpoints.cs**: Create a static class with an extension method `MapProductEndpoints(this IEndpointRouteBuilder app)`. Use Minimal APIs to expose the CRUD operations from `ProductService`.
+3. **Program.cs**: Update the DI container to register `ProductService` as a Singleton (to persist the in-memory list during the app lifecycle) and call `MapProductEndpoints()`.
+4. **ApiService.http**: Add complete HTTP request examples to test all 5 endpoints (GET all, GET by ID, POST new, PUT update, DELETE). Include valid JSON request bodies matching the Product model.
+
+Ensure the code follows modern C# 12 and .NET 10 Minimal API best practices.
+
+-- allow permissions

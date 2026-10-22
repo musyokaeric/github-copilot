@@ -1,6 +1,34 @@
 @ApiService_HostAddress = http://localhost:5384
 
-GET {{ApiService_HostAddress}}/weatherforecast/
+### Get all products
+GET {{ApiService_HostAddress}}/api/products
 Accept: application/json
 
-###
+### Get product by ID
+GET {{ApiService_HostAddress}}/api/products/1
+Accept: application/json
+
+### Create a new product
+POST {{ApiService_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Wireless Mouse",
+  "description": "Ergonomic wireless mouse with silent clicks and 12-month battery life.",
+  "price": 34.99,
+  "imageUrl": "https://example.com/images/mouse.jpg"
+}
+
+### Update an existing product
+PUT {{ApiService_HostAddress}}/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Wireless Noise-Cancelling Headphones (2nd Gen)",
+  "description": "Over-ear Bluetooth headphones with 40-hour battery life and adaptive noise cancellation.",
+  "price": 229.99,
+  "imageUrl": "https://example.com/images/headphones-v2.jpg"
+}
+
+### Delete a product
+DELETE {{ApiService_HostAddress}}/api/products/5
