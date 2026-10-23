@@ -32,3 +32,39 @@ Content-Type: application/json
 
 ### Delete a product
 DELETE {{ApiService_HostAddress}}/api/products/5
+
+### Get all orders
+GET {{ApiService_HostAddress}}/api/orders
+Accept: application/json
+
+### Get order by ID
+GET {{ApiService_HostAddress}}/api/orders/1
+Accept: application/json
+
+### Create a new order
+POST {{ApiService_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Carol Wanjiru",
+  "status": "Pending",
+  "items": [
+    { "productId": 3, "productName": "4K Webcam", "quantity": 1, "unitPrice": 129.00 },
+    { "productId": 2, "productName": "Mechanical Keyboard", "quantity": 2, "unitPrice": 89.50 }
+  ]
+}
+
+### Update an existing order
+PUT {{ApiService_HostAddress}}/api/orders/2
+Content-Type: application/json
+
+{
+  "customerName": "Brian Otieno",
+  "status": "Paid",
+  "items": [
+    { "productId": 2, "productName": "Mechanical Keyboard", "quantity": 1, "unitPrice": 89.50 }
+  ]
+}
+
+### Delete an order
+DELETE {{ApiService_HostAddress}}/api/orders/1

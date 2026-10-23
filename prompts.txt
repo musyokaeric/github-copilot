@@ -20,3 +20,16 @@ I need to implement the business logic and Minimal APIs for the `Product` domain
 Ensure the code follows modern C# 12 and .NET 10 Minimal API best practices.
 
 -- allow permissions
+
+** Hands-On: Generating Order Domain Business Logic with Custom Instructions **
+
+prompt:
+I need to implement the `Order` domain model and its business logic in the `ApiService` project. 
+
+Please rely on the established custom instructions for the folder layout, endpoint mapping patterns, and DI registration. Plan and execute the following:
+
+1. Create an `Order` model.
+2. Create `OrderService` with an in-memory list (seed 2 example orders) and standard CRUD operations.
+3. Create `OrderEndpoints` to expose these CRUD operations. 
+4. Wire up the service and endpoints in `Program.cs`.
+5. Add test requests for all `Order` endpoints to `.http`.
