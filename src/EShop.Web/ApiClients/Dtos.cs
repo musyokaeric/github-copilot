@@ -2,6 +2,8 @@ namespace EShop.Web.ApiClients;
 
 public record ProductDto(int Id, string Name, string Description, decimal Price, string? ImageUrl);
 
+public record CustomerDto(Guid Id, string Name, string Email);
+
 public record CartItemDto(int ProductId, string ProductName, decimal UnitPrice, int Quantity);
 
 public record ShoppingCartDto(Guid Id, List<CartItemDto> Items, decimal Total);

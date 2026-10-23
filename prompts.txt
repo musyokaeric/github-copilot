@@ -61,3 +61,14 @@ I've accepted the "Shopping Cart Feature — Implementation Plan" in the plan.md
 
 ## Review Phase
 Use the /review instruction to review the code changes and resolve where appropriate
+
+** Hands-On: Customer Domain Business Logic Prompt with Skills **
+backend prompt:
+/minimal-api-feature create the "Customer" feature
+
+frontend prompt:
+Use the blazor-crud-component skill to create a Blazor UI for the @Customer.cs domain
+or
+/blazor-crud-component create a Blazor UI for the @EShop.ApiService\Models\Customer.cs domain
+
+-- make it autopilot and develop this, enable all permissions
