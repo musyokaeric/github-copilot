@@ -33,3 +33,31 @@ Please rely on the established custom instructions for the folder layout, endpoi
 3. Create `OrderEndpoints` to expose these CRUD operations. 
 4. Wire up the service and endpoints in `Program.cs`.
 5. Add test requests for all `Order` endpoints to `.http`.
+
+** Hands-On: Core Agentic Workflow: Explore -> Plan -> Code -> Review **
+
+## Plan Phase
+Shopping Cart Planning Prompt
+prompt:
+I need to design the architecture and implementation plan for a new "Shopping Cart" feature in the EShopCopilot project. 
+
+Do not generate the full code yet. Provide a step-by-step execution plan covering both the `EShopCopilot.ApiService` (backend) and `EShopCopilot.Web` (Blazor frontend).
+
+Requirements:
+1. Users can add and remove `Product` items to/from their Shopping Cart.
+2. The Cart needs a Checkout operation.
+3. Upon successful Checkout, the system must create a new `Order` (referencing @OrderService.cs) and then clear/delete the Shopping Cart.
+
+Please outline:
+- The new domain models needed (e.g., ShoppingCart, CartItem).
+- The updates required in the ApiService (Services, Endpoints, DI).
+- The new components and API clients needed in the Web project.
+- The exact sequence of steps we should execute to build this.
+
+## Code Phase
+Shopping Cart Accept Plan - Autopilot Prompt
+prompt:
+I've accepted the "Shopping Cart Feature — Implementation Plan" in the plan.md file. Please proceed and implement the plan with auto-pilot mode.
+
+## Review Phase
+Use the /review instruction to review the code changes and resolve where appropriate

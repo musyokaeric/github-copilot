@@ -1,0 +1,54 @@
+@page "/products"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using EShop.Web.ApiClients
+@using EShop.Web.Services
+@inject ProductApiClient ProductsApi
+@inject CartApiClient CartApi
+@inject CartSession Session
+
+<PageTitle>Products</PageTitle>
+
+<h1>Products</h1>
+
+@if (_message is not null)
+{
+    <div class="alert alert-success">@_message</div>
+}
+
+@if (_products is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        @foreach (var product in _products)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="fw-bold">@product.Price.ToString("C")</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary" @onclick="() => AddToCart(product)">Add to cart</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private IReadOnlyList<ProductDto>? _products;
+    private string? _message;
+
+    protected override async Task OnInitializedAsync() => _products = await ProductsApi.GetProductsAsync();
+
+    private async Task AddToCart(ProductDto product)
+    {
+        var cart = await CartApi.AddItemAsync(await Session.GetCartIdAsync(), product.Id);
+        _message = cart is null ? null : $"Added \"{product.Name}\" to your cart.";
+    }
+}

@@ -68,3 +68,29 @@ Content-Type: application/json
 
 ### Delete an order
 DELETE {{ApiService_HostAddress}}/api/orders/1
+
+@CartId = 3f2504e0-4f89-11d3-9a0c-0305e82c3301
+
+### Get (or create) a cart
+GET {{ApiService_HostAddress}}/api/carts/{{CartId}}
+Accept: application/json
+
+### Add an item to the cart
+POST {{ApiService_HostAddress}}/api/carts/{{CartId}}/items
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 1
+}
+
+### Remove an item from the cart
+DELETE {{ApiService_HostAddress}}/api/carts/{{CartId}}/items/2
+
+### Checkout the cart (creates an order and clears the cart)
+POST {{ApiService_HostAddress}}/api/carts/{{CartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Carol Wanjiru"
+}

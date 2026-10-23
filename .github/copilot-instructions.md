@@ -29,7 +29,8 @@ Always run via `EShop.AppHost` so service discovery and the `/health` checks wor
   - `Models\` holds domain classes (`Product`).
   - `Services\` holds singleton in-memory stores (`ProductService`: a `List<Product>` seeded in the constructor, guarded by a `Lock`). There is no database.
   - `Endpoints\` holds static classes exposing `Map<Entity>Endpoints(this IEndpointRouteBuilder)` extension methods, which `Program.cs` calls after registering the service.
-- **EShop.Web** is Blazor Server with interactive server render mode and Bootstrap. It is expected to call the API by Aspire service name (`apiservice`), not by hard-coded URL.
+- **EShop.Web** is Blazor Server with interactive server render mode and Bootstrap. It calls the API through typed `HttpClient`s in `ApiClients\` registered with base address `https+http://apiservice` (never a hard-coded URL). `Services\CartSession` (scoped per circuit) holds the cart id. Pages that use buttons set `@rendermode InteractiveServer`.
+- **Cart flow:** `CartService` (ApiService) depends on `ProductService` and `OrderService`; checkout builds an `Order` through `OrderService.Create`, then removes the cart.
 
 ## Conventions
 
