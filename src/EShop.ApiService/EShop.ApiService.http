@@ -125,3 +125,76 @@ Content-Type: application/json
 {
   "customerName": "Carol Wanjiru"
 }
+
+###############################################################################
+# Checkout lifecycle journey: create cart -> add product -> checkout
+# Run the requests below top to bottom (host must match launchSettings.json).
+# Uses a dedicated cart id so it doesn't collide with the examples above.
+# Products are seeded in memory: product 2 = Mechanical Keyboard @ 89.50.
+# Requests are named so later ones reference earlier responses (VS Code REST Client syntax).
+###############################################################################
+
+@JourneyCartId = 7c9e6679-7425-40de-944b-e07fc1f90ae7
+
+### Step 1: Create the cart (GET creates on first access)
+# EXPECT: 200 OK, id == JourneyCartId, items == [] (empty)
+# @name createCart
+GET {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}
+Accept: application/json
+
+### Step 2: Add product 2 (quantity 2) to the cart
+# EXPECT: 200 OK, items has 1 entry: productId 2, productName "Mechanical Keyboard",
+#         unitPrice 89.50, quantity 2
+# @name addItem
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/items
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 2
+}
+
+### Step 3: Checkout
+# EXPECT: 201 Created, Location header -> /api/orders/{id},
+#         body: customerName "Journey Customer", status 0 (Pending),
+#         items == the cart items, total == 179.00 (2 x 89.50)
+# @name checkout
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Journey Customer"
+}
+
+@JourneyOrderId = {{checkout.response.body.$.id}}
+
+### Verify A: order was created and is retrievable
+# EXPECT: 200 OK, same id as the checkout response, customerName "Journey Customer",
+#         one item (productId 2, quantity 2), total 179.00
+GET {{ApiService_HostAddress}}/api/orders/{{JourneyOrderId}}
+Accept: application/json
+
+### Verify B: cart was cleared
+# Checkout removes the cart; GET recreates a fresh one.
+# EXPECT: 200 OK, id == JourneyCartId, items == [] (not the 2 keyboards)
+GET {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}
+Accept: application/json
+
+### Verify C (negative): re-checkout of the cleared cart must not create a duplicate order
+# EXPECT: 404 Not Found (cart no longer exists after Verify B is skipped) or
+#         400 Bad Request "Cart is empty." (if Verify B already recreated it)
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Journey Customer"
+}
+
+### Verify D (negative): checkout without a customer name is rejected
+# EXPECT: 400 Bad Request "Customer name is required."
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": ""
+}

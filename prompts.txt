@@ -72,3 +72,67 @@ or
 /blazor-crud-component create a Blazor UI for the @EShop.ApiService\Models\Customer.cs domain
 
 -- make it autopilot and develop this, enable all permissions
+
+
+** Hands-On: Architecting the Enterprise .NET Guardian Custom Agent **
+
+Create The Enterprise .NET Architect Agent
+
+Create with Copilot
+
+Describe your Agent:
+
+The Enterprise .NET Architect Agent
+A senior-level architectural guardrail specializing in .NET distributed systems, clean architecture boundaries, and high-performance patterns. This agent treats your code with enterprise rigidity, ensuring business rules do not bleed into transport layers
+
+What should it do? 
+Analyze proposed code updates for structural anti-patterns (e.g., tight coupling, missing async/await safety, violation of single-responsibility principles). It ensures Minimal APIs stay thin and routes all operational logic to the appropriate underlying services.
+
+When should it be used? 
+Before making major changes to core domain logic, when refactoring complex state transitions like the ShoppingCart checkout sequence, or during local code-review passes.
+
+--
+see agent
+.github/agents/dotnet-architecture-validator.agent.md
+
+Testing Custom Dotnet Architect Agent
+
+/agent
+● Selected custom agent: dotnet-architect
+
+prompt: (correct the @ locations)
+review the interaction between @CartEndpoints.cs and @CartService.cs. Are we leaking business rules into the HTTP layer?
+
+
+** Hands-On: Building the EShop Workflow Orchestrator Custom Agent **
+
+Create E2E The EShop Workflow Orchestrator Custom Agent
+
+Create with Copilot
+
+Describe your Agent:
+The EShop Workflow Orchestrator
+
+Description
+An integration specialist focused entirely on end-to-end user journeys and operational state validation. This agent treats the backend API and the frontend WebApp as a cohesive unit, mapping out how data flows across the .NET Aspire orchestrator mesh.
+
+What should it do? 
+Validate cross-cutting scenarios (like adding an item to a cart, transforming that cart into an order during checkout, and asserting the cart is properly destroyed). It specializes in generating high-fidelity .http files and integration test runners.
+
+When should it be used? 
+Whenever a feature spans multiple domain contexts (e.g., combining Product, ShoppingCart, and Ordering), or when designing complete behavioral test suites.
+
+Tools the agent will use: @workspace dependency graph analyzer, raw REST API execution specs, and localized JSON payload verification profiles.
+
+--
+see agent
+.github/agents/integration-scenario-mapper.agent.md
+
+
+Testing Custom EShop Integration Orchestrator Agent
+
+/agent
+● Selected custom agent: integration-journey-validator
+
+prompt:
+Analyze our checkout workflow and generate a complete EShop.ApiService.http test script that executes a 3-step lifecycle: create a cart, add product into cart, and execute checkout process. Ensure the script validates that the cart is cleared and an order is created.
