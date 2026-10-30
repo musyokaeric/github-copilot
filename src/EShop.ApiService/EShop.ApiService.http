@@ -1,6 +1,200 @@
 @ApiService_HostAddress = http://localhost:5384
 
-GET {{ApiService_HostAddress}}/weatherforecast/
+### Get all products
+GET {{ApiService_HostAddress}}/api/products
 Accept: application/json
 
-###
+### Get product by ID
+GET {{ApiService_HostAddress}}/api/products/1
+Accept: application/json
+
+### Create a new product
+POST {{ApiService_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Wireless Mouse",
+  "description": "Ergonomic wireless mouse with silent clicks and 12-month battery life.",
+  "price": 34.99,
+  "imageUrl": "https://example.com/images/mouse.jpg"
+}
+
+### Update an existing product
+PUT {{ApiService_HostAddress}}/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Wireless Noise-Cancelling Headphones (2nd Gen)",
+  "description": "Over-ear Bluetooth headphones with 40-hour battery life and adaptive noise cancellation.",
+  "price": 229.99,
+  "imageUrl": "https://example.com/images/headphones-v2.jpg"
+}
+
+### Delete a product
+DELETE {{ApiService_HostAddress}}/api/products/5
+
+@CustomerId = 3f2504e0-4f89-11d3-9a0c-0305e82c3301
+
+### Get all customers
+GET {{ApiService_HostAddress}}/api/customers
+Accept: application/json
+
+### Get customer by ID
+GET {{ApiService_HostAddress}}/api/customers/{{CustomerId}}
+Accept: application/json
+
+### Create a new customer
+POST {{ApiService_HostAddress}}/api/customers
+Content-Type: application/json
+
+{
+  "name": "Carol Wanjiru",
+  "email": "carol.wanjiru@example.com"
+}
+
+### Update an existing customer
+PUT {{ApiService_HostAddress}}/api/customers/{{CustomerId}}
+Content-Type: application/json
+
+{
+  "name": "Carol Wanjiru",
+  "email": "carol.w@example.com"
+}
+
+### Delete a customer
+DELETE {{ApiService_HostAddress}}/api/customers/{{CustomerId}}
+
+### Get all orders
+GET {{ApiService_HostAddress}}/api/orders
+Accept: application/json
+
+### Get order by ID
+GET {{ApiService_HostAddress}}/api/orders/1
+Accept: application/json
+
+### Create a new order
+POST {{ApiService_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Carol Wanjiru",
+  "status": "Pending",
+  "items": [
+    { "productId": 3, "productName": "4K Webcam", "quantity": 1, "unitPrice": 129.00 },
+    { "productId": 2, "productName": "Mechanical Keyboard", "quantity": 2, "unitPrice": 89.50 }
+  ]
+}
+
+### Update an existing order
+PUT {{ApiService_HostAddress}}/api/orders/2
+Content-Type: application/json
+
+{
+  "customerName": "Brian Otieno",
+  "status": "Paid",
+  "items": [
+    { "productId": 2, "productName": "Mechanical Keyboard", "quantity": 1, "unitPrice": 89.50 }
+  ]
+}
+
+### Delete an order
+DELETE {{ApiService_HostAddress}}/api/orders/1
+
+@CartId = 3f2504e0-4f89-11d3-9a0c-0305e82c3301
+
+### Get (or create) a cart
+GET {{ApiService_HostAddress}}/api/carts/{{CartId}}
+Accept: application/json
+
+### Add an item to the cart
+POST {{ApiService_HostAddress}}/api/carts/{{CartId}}/items
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 1
+}
+
+### Remove an item from the cart
+DELETE {{ApiService_HostAddress}}/api/carts/{{CartId}}/items/2
+
+### Checkout the cart (creates an order and clears the cart)
+POST {{ApiService_HostAddress}}/api/carts/{{CartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Carol Wanjiru"
+}
+
+###############################################################################
+# Checkout lifecycle journey: create cart -> add product -> checkout
+# Run the requests below top to bottom (host must match launchSettings.json).
+# Uses a dedicated cart id so it doesn't collide with the examples above.
+# Products are seeded in memory: product 2 = Mechanical Keyboard @ 89.50.
+# Requests are named so later ones reference earlier responses (VS Code REST Client syntax).
+###############################################################################
+
+@JourneyCartId = 7c9e6679-7425-40de-944b-e07fc1f90ae7
+
+### Step 1: Create the cart (GET creates on first access)
+# EXPECT: 200 OK, id == JourneyCartId, items == [] (empty)
+# @name createCart
+GET {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}
+Accept: application/json
+
+### Step 2: Add product 2 (quantity 2) to the cart
+# EXPECT: 200 OK, items has 1 entry: productId 2, productName "Mechanical Keyboard",
+#         unitPrice 89.50, quantity 2
+# @name addItem
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/items
+Content-Type: application/json
+
+{
+  "productId": 2,
+  "quantity": 2
+}
+
+### Step 3: Checkout
+# EXPECT: 201 Created, Location header -> /api/orders/{id},
+#         body: customerName "Journey Customer", status 0 (Pending),
+#         items == the cart items, total == 179.00 (2 x 89.50)
+# @name checkout
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Journey Customer"
+}
+
+@JourneyOrderId = {{checkout.response.body.$.id}}
+
+### Verify A: order was created and is retrievable
+# EXPECT: 200 OK, same id as the checkout response, customerName "Journey Customer",
+#         one item (productId 2, quantity 2), total 179.00
+GET {{ApiService_HostAddress}}/api/orders/{{JourneyOrderId}}
+Accept: application/json
+
+### Verify B: cart was cleared
+# Checkout removes the cart; GET recreates a fresh one.
+# EXPECT: 200 OK, id == JourneyCartId, items == [] (not the 2 keyboards)
+GET {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}
+Accept: application/json
+
+### Verify C (negative): re-checkout of the cleared cart must not create a duplicate order
+# EXPECT: 404 Not Found (cart no longer exists after Verify B is skipped) or
+#         400 Bad Request "Cart is empty." (if Verify B already recreated it)
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": "Journey Customer"
+}
+
+### Verify D (negative): checkout without a customer name is rejected
+# EXPECT: 400 Bad Request "Customer name is required."
+POST {{ApiService_HostAddress}}/api/carts/{{JourneyCartId}}/checkout
+Content-Type: application/json
+
+{
+  "customerName": ""
+}

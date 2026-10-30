@@ -1,0 +1,44 @@
+@page "/customers"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using EShop.Web.ApiClients
+@inject CustomerApiClient CustomersApi
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+@if (_customers is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (_customers.Count == 0)
+{
+    <p>No customers found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in _customers)
+            {
+                <tr>
+                    <td>@customer.Name</td>
+                    <td>@customer.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<CustomerDto>? _customers;
+
+    protected override async Task OnInitializedAsync() =>
+        _customers = await CustomersApi.GetCustomersAsync();
+}

@@ -1,4 +1,6 @@
 using EShop.Web;
+using EShop.Web.ApiClients;
+using EShop.Web.Services;
 using EShop.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,12 +14,10 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-    });
+builder.Services.AddScoped<CartSession>();
+builder.Services.AddHttpClient<ProductApiClient>(client => client.BaseAddress = new("https+http://apiservice"));
+builder.Services.AddHttpClient<CartApiClient>(client => client.BaseAddress = new("https+http://apiservice"));
+builder.Services.AddHttpClient<CustomerApiClient>(client => client.BaseAddress = new("https+http://apiservice"));
 
 var app = builder.Build();
 

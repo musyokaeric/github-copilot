@@ -1,0 +1,87 @@
+@page "/cart"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@using EShop.Web.ApiClients
+@using EShop.Web.Services
+@inject CartApiClient CartApi
+@inject CartSession Session
+
+<PageTitle>Cart</PageTitle>
+
+<h1>Shopping Cart</h1>
+
+@if (_order is not null)
+{
+    <div class="alert alert-success">
+        Order #@_order.Id placed for @_order.CustomerName. Total: @_order.Total.ToString("C").
+    </div>
+}
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger">@_error</div>
+}
+
+@if (_cart is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (_cart.Items.Count == 0)
+{
+    <p>Your cart is empty. <a href="products">Browse products</a>.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr><th>Product</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in _cart.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.UnitPrice.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@((item.UnitPrice * item.Quantity).ToString("C"))</td>
+                    <td><button class="btn btn-sm btn-outline-danger" @onclick="() => Remove(item.ProductId)">Remove</button></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><th colspan="3">Total</th><th>@_cart.Total.ToString("C")</th><th></th></tr>
+        </tfoot>
+    </table>
+
+    <div class="input-group mb-3" style="max-width: 480px;">
+        <input class="form-control" placeholder="Customer name" @bind="_customerName" @bind:event="oninput" />
+        <button class="btn btn-success" @onclick="Checkout">Checkout</button>
+    </div>
+}
+
+@code {
+    private ShoppingCartDto? _cart;
+    private OrderDto? _order;
+    private string? _error;
+    private string _customerName = string.Empty;
+
+    protected override async Task OnInitializedAsync() => _cart = await CartApi.GetCartAsync(await Session.GetCartIdAsync());
+
+    private async Task Remove(int productId)
+    {
+        _cart = await CartApi.RemoveItemAsync(await Session.GetCartIdAsync(), productId) ?? _cart;
+    }
+
+    private async Task Checkout()
+    {
+        _error = null;
+        var (order, error) = await CartApi.CheckoutAsync(await Session.GetCartIdAsync(), _customerName);
+        if (order is null)
+        {
+            _error = error;
+            return;
+        }
+
+        _order = order;
+        _cart = await CartApi.GetCartAsync(await Session.ResetAsync());
+    }
+}
